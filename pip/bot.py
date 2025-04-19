@@ -15,7 +15,7 @@ BOT_TOKEN = "7380534180:AAEBP2VcY363wUpiibe_k7MfPZtKxsEVTKE"
 # 🌐 URL WebApp
 WEBAPP_URL = "https://demob-counter.vercel.app"
 
-# ✅ Указываем parse_mode по-новому
+# ✅ Настройка бота
 bot = Bot(
     token=BOT_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML)
@@ -23,11 +23,11 @@ bot = Bot(
 
 dp = Dispatcher()
 
-# 🔁 Универсальный обработчик /start
-@dp.message(F.text == "/start")
+# 🔁 Обработчик команды /start и /start@BotUsername
+@dp.message(F.text.startswith("/start"))
 async def start_handler(message: Message):
     if message.chat.type == "private":
-        # 💬 Личка → кнопка с WebApp
+        # 📲 В личке — кнопка с WebApp
         keyboard = ReplyKeyboardMarkup(
             resize_keyboard=True,
             keyboard=[
@@ -44,7 +44,7 @@ async def start_handler(message: Message):
             reply_markup=keyboard
         )
     else:
-        # 👥 Группа → кнопка со ссылкой в ЛС
+        # 👥 В группе — кнопка со ссылкой на бота в ЛС
         bot_username = (await bot.get_me()).username
         keyboard = ReplyKeyboardMarkup(
             resize_keyboard=True,
@@ -58,10 +58,16 @@ async def start_handler(message: Message):
             ]
         )
         await message.answer(
-            "📌 WebApp можно открыть только в личных сообщениях.\nНажми кнопку ниже, чтобы перейти:",
+            "📌 Счётчик можно открыть только в личных сообщениях.\nНажми кнопку ниже, чтобы перейти:",
             reply_markup=keyboard
         )
 
+# 💬 (Опционально) логируем любые сообщения, чтобы видеть активность
+@dp.message()
+async def catch_all(message: Message):
+    print(f"[{message.chat.type}] {message.from_user.username}: {message.text}")
+
+# 🚀 Запуск бота
 async def main():
     await dp.start_polling(bot)
 
