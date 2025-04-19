@@ -23,34 +23,44 @@ bot = Bot(
 
 dp = Dispatcher()
 
-# Обработчик команды /start для личных сообщений
+# 🔁 Универсальный обработчик /start
 @dp.message(F.text == "/start")
 async def start_handler(message: Message):
-    keyboard = ReplyKeyboardMarkup(
-        resize_keyboard=True,
-        keyboard=[
-            [
-                KeyboardButton(
-                    text="Открыть счётчик дембеля",
-                    web_app=WebAppInfo(url=WEBAPP_URL)
-                )
-            ]
-        ]
-    )
-    await message.answer("Нажми кнопку ниже, чтобы открыть счётчик ⏳", reply_markup=keyboard)
-
-# Обработчик для сообщения с ссылкой на WebApp в группе
-@dp.message(F.text == "Открыть счётчик дембеля")
-async def send_webapp_link(message: Message):
-    await message.answer(
-        "Нажми на ссылку ниже, чтобы открыть счётчик дембеля:",
-        reply_markup=ReplyKeyboardMarkup(
+    if message.chat.type == "private":
+        # 💬 Личка → кнопка с WebApp
+        keyboard = ReplyKeyboardMarkup(
             resize_keyboard=True,
             keyboard=[
-                [KeyboardButton(text="Открыть WebApp", url=WEBAPP_URL)]
+                [
+                    KeyboardButton(
+                        text="Открыть счётчик дембеля",
+                        web_app=WebAppInfo(url=WEBAPP_URL)
+                    )
+                ]
             ]
         )
-    )
+        await message.answer(
+            "Нажми кнопку ниже, чтобы открыть счётчик ⏳",
+            reply_markup=keyboard
+        )
+    else:
+        # 👥 Группа → кнопка со ссылкой в ЛС
+        bot_username = (await bot.get_me()).username
+        keyboard = ReplyKeyboardMarkup(
+            resize_keyboard=True,
+            keyboard=[
+                [
+                    KeyboardButton(
+                        text="Открыть счётчик дембеля (в личке)",
+                        url=f"https://t.me/{bot_username}"
+                    )
+                ]
+            ]
+        )
+        await message.answer(
+            "📌 WebApp можно открыть только в личных сообщениях.\nНажми кнопку ниже, чтобы перейти:",
+            reply_markup=keyboard
+        )
 
 async def main():
     await dp.start_polling(bot)
