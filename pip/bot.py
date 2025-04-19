@@ -53,7 +53,7 @@ async def start_handler(message: Message):
                 [
                     InlineKeyboardButton(
                         text="Открыть счётчик дембеля (в личке)",
-                        url=f"https://t.me/demobilzationbot"
+                        url="https://t.me/demobilzationbot"
                     )
                 ]
             ]
