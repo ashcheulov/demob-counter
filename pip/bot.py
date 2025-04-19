@@ -6,6 +6,8 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     KeyboardButton,
     WebAppInfo,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
 )
 from aiogram.client.default import DefaultBotProperties
 
@@ -23,7 +25,7 @@ bot = Bot(
 
 dp = Dispatcher()
 
-# 🔁 Обработчик команды /start и /start@BotUsername
+# 🔁 Обработчик команды /start
 @dp.message(F.text.startswith("/start"))
 async def start_handler(message: Message):
     if message.chat.type == "private":
@@ -44,13 +46,12 @@ async def start_handler(message: Message):
             reply_markup=keyboard
         )
     else:
-        # 👥 В группе — кнопка со ссылкой на бота в ЛС
+        # 👥 В группе — инлайн-кнопка со ссылкой на бота
         bot_username = (await bot.get_me()).username
-        keyboard = ReplyKeyboardMarkup(
-            resize_keyboard=True,
-            keyboard=[
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
                 [
-                    KeyboardButton(
+                    InlineKeyboardButton(
                         text="Открыть счётчик дембеля (в личке)",
                         url=f"https://t.me/{bot_username}"
                     )
@@ -62,7 +63,7 @@ async def start_handler(message: Message):
             reply_markup=keyboard
         )
 
-# 💬 (Опционально) логируем любые сообщения, чтобы видеть активность
+# 💬 Логируем любые сообщения (можно удалить)
 @dp.message()
 async def catch_all(message: Message):
     print(f"[{message.chat.type}] {message.from_user.username}: {message.text}")
